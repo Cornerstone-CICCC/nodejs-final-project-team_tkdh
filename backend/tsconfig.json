@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "./src",
     "outDir": "./dist",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -8,5 +8,5 @@
     "strict": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "prisma.config.ts"]
+  "include": ["src/**/*"]
 }
