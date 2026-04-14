@@ -1,0 +1,50 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { QuestionCard } from "../components/Quiz/QuestionCard";
+import { Timer } from "../components/Quiz/Timer";
+import { TeamChat } from "../components/Chat/TeamChat";
+import { mockQuiz, mockMessages } from "../mock";
+import type { Message } from "../types";
+
+export function GamePage() {
+  const navigate = useNavigate();
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [messages, setMessages] = useState<Message[]>(mockMessages);
+
+  const handleSend = (text: string) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `m-${Date.now()}`,
+        userId: "u1",
+        userName: "You",
+        text,
+        timestamp: Date.now(),
+      },
+    ]);
+  };
+
+  return (
+    <div className="game-page">
+      <div className="game-page__quiz">
+        <Timer timeLeft={20} />
+        <QuestionCard
+          quiz={mockQuiz}
+          questionIndex={0}
+          totalQuestions={5}
+          selectedOption={selectedOption}
+          onSelect={setSelectedOption}
+        />
+        <button
+          className="game-page__next"
+          onClick={() => navigate("/result")}
+        >
+          Go to Result (dev)
+        </button>
+      </div>
+      <div className="game-page__chat">
+        <TeamChat messages={messages} onSend={handleSend} />
+      </div>
+    </div>
+  );
+}
