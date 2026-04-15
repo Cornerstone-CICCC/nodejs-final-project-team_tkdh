@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import userModel from "../models/user.model";
 
+// check if user logged in or not
 export const checkIsLoggedIn = async (
   req: Request,
   res: Response,
@@ -20,6 +21,7 @@ export const checkIsLoggedIn = async (
   next();
 };
 
+// allow a logged-in user to logout ONLY their account
 export const logoutCheck = async (
   req: Request,
   res: Response,
