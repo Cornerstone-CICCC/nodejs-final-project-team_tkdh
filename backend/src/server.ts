@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 
 app.use('/users', userRouter);
-app.use('/quiz', quizRouter);
+app.use('/quizzes', quizRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).send('Invalid route.');
