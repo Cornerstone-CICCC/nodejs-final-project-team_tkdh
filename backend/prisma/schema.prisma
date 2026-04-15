@@ -17,4 +17,12 @@ model User {
   name        String
   email       String
   password    String
+  team        Int? 
+}
+
+model Quiz {
+  id          Int @id @default(autoincrement())
+  question    String
+  options     String[]
+  answer      String
 }

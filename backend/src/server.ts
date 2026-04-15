@@ -1,10 +1,15 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
+import userRouter from './routes/user.routes';
+import quizRouter from './routes/quiz.routes';
 
 const app = express();
 
 app.use(express.json());
+
+app.use('/users', userRouter);
+app.use('/quiz', quizRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).send('Invalid route.');
