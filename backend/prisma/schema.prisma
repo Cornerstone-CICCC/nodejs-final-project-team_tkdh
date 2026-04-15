@@ -12,9 +12,18 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id          Int             @id @default(autoincrement())
+model Users {
+  id          Int @id @default(autoincrement())
   name        String
   email       String
   password    String
+  @@map("users")  
+}
+
+model Quizzes {
+  id Int @id @default(autoincrement())
+  question String
+  options String[]
+  answer String
+  @@map("quizzes")
 }
