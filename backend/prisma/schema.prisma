@@ -13,8 +13,15 @@ datasource db {
 }
 
 model User {
-  id          Int             @id @default(autoincrement())
+  id          Int @id @default(autoincrement())
   name        String
   email       String
   password    String
+}
+
+model Quizzes {
+  id Int @id @default(autoincrement())
+  question String
+  options String[]
+  answer String
 }
