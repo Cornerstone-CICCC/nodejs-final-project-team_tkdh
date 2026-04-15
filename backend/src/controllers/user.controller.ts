@@ -27,6 +27,10 @@ const register = async (
       res.status(409).json({ error: "Email is already registered." });
       return;
     }
+    res.cookie("userId", newUser.id, {
+      maxAge: 60 * 60 * 1000,
+      httpOnly: true,
+    });
     res.cookie("userEmail", newUser.email, {
       maxAge: 60 * 60 * 1000,
       httpOnly: true,
@@ -61,6 +65,10 @@ const login = async (
       res.status(401).json({ error: "Invalid email or password" });
       return;
     }
+    res.cookie("userId", loginUser.id, {
+      maxAge: 60 * 60 * 1000,
+      httpOnly: true,
+    });
     res.cookie("userEmail", loginUser.email, {
       maxAge: 60 * 60 * 1000,
       httpOnly: true,
@@ -82,6 +90,7 @@ const logout = async (req: Request, res: Response) => {
       res.status(400).json({ message: "Login user is not found" });
       return;
     }
+    res.clearCookie("userId");
     res.clearCookie("userEmail");
     res
       .status(200)
@@ -108,7 +117,12 @@ const getUserById = async (req: Request, res: Response) => {
       res.status(404).json({ message: "Cannot find user" });
       return;
     }
-    res.status(200).json(user);
+    const userWithoutPass = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+    res.status(200).json(userWithoutPass);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
