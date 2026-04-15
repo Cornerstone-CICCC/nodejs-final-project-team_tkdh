@@ -42,45 +42,45 @@ const addUser = async (req: Request, res: Response) => {
   }
 };
 
-const updateUserById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { name, email } = req.body;
-  try {
-    const updatedUser = await userModel.edit(Number(id), {
-      name,
-      email,
-    });
-    if (!updatedUser) {
-      res.status(404).json({ message: 'Unable to find user' });
-      return;
-    }
-    res.status(200).json(updatedUser);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+// const updateUserById = async (req: Request, res: Response) => {
+//   const { id } = req.params;
+//   const { name, email } = req.body;
+//   try {
+//     const updatedUser = await userModel.edit(Number(id), {
+//       name,
+//       email,
+//     });
+//     if (!updatedUser) {
+//       res.status(404).json({ message: 'Unable to find user' });
+//       return;
+//     }
+//     res.status(200).json(updatedUser);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
 
-const deleteUserByID = async (req: Request, res: Response) => {
-  const { id } = req.params;
+// const deleteUserByID = async (req: Request, res: Response) => {
+//   const { id } = req.params;
 
-  try {
-    const deletedUser = await userModel.remove(Number(id));
-    if (!deletedUser) {
-      res.status(404).json({ message: 'User not found' });
-      return;
-    }
-    res.status(200).json(deletedUser);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+//   try {
+//     const deletedUser = await userModel.remove(Number(id));
+//     if (!deletedUser) {
+//       res.status(404).json({ message: 'User not found' });
+//       return;
+//     }
+//     res.status(200).json(deletedUser);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
 
 export default {
   getAllUsers,
   getUserById,
   addUser,
-  updateUserById,
-  deleteUserByID,
+  // updateUserById,
+  // deleteUserByID,
 };
