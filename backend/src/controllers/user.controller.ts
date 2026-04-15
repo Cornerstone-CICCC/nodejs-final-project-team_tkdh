@@ -1,73 +1,101 @@
-import { Request, Response } from 'express';
-import userModel from '../models/user.model';
-import { User } from '../types/user.type';
-import zxcvbn from 'zxcvbn';
+import { Request, Response } from "express";
+import userModel from "../models/user.model";
+import { User } from "../types/user.type";
+import zxcvbn from "zxcvbn";
 
 const register = async (
-  req: Request<{}, {}, Omit<User, 'id'>>,
+  req: Request<{}, {}, Omit<User, "id">>,
   res: Response,
 ) => {
   const { name, email, password } = req.body;
-  if (!name?.trim() || !email?.trim() || !password?.trim()) {
-    res.status(400).json({ error: 'All fields are required' });
+  if (!name.trim() || !email.trim() || !password.trim()) {
+    res.status(400).json({ error: "All fields are required" });
     return;
   }
 
   const passwordScore = zxcvbn(password).score;
   if (passwordScore <= 2) {
     res.status(400).json({
-      error: 'Password is too weak. Try a longer or more complex password.',
+      error: "Password is too weak. Try a longer or more complex password.",
     });
     return;
   }
 
-  const newUser = await userModel.add(name, email, password);
-  if (!newUser) {
-    res.status(409).json({ error: 'Email is already registered.' });
-    return;
+  try {
+    const newUser = await userModel.add({ name, email, password });
+    if (!newUser) {
+      res.status(409).json({ error: "Email is already registered." });
+      return;
+    }
+    res.cookie("userEmail", newUser.email, {
+      maxAge: 60 * 60 * 1000,
+      httpOnly: true,
+    });
+    const userWithoutPass = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+    };
+    res.status(201).json(userWithoutPass);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
-
-  res.cookie('userId', newUser.id, { maxAge: 60 * 60 * 1000, httpOnly: true });
-  res.cookie('username', newUser.name, {
-    maxAge: 60 * 60 * 1000,
-    httpOnly: true,
-  });
-
-  res
-    .status(201)
-    .json({ id: newUser.id, name: newUser.name, email: newUser.email });
 };
 
-const login = async (req: Request, res: Response) => {
+const login = async (
+  req: Request<{ id: number }, {}, { email: string; password: string }>,
+  res: Response,
+) => {
+  const { id } = req.params;
   const { email, password } = req.body;
 
   if (!email?.trim() || !password?.trim()) {
-    res.status(401).json({ error: 'Email and password are required.' });
+    res.status(401).json({ error: "Email and password are required." });
     return;
   }
 
-  const user = await userModel.login(email, password);
-  if (!user) {
-    res.status(401).json({ error: 'Invalid email or password' });
-    return;
+  try {
+    const loginUser = await userModel.login(email, password);
+    if (!loginUser) {
+      res.status(401).json({ error: "Invalid email or password" });
+      return;
+    }
+    res.cookie("userEmail", loginUser.email, {
+      maxAge: 60 * 60 * 1000,
+      httpOnly: true,
+    });
+    res
+      .status(200)
+      .json({ message: `${loginUser.name} is successfully logged in` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
+};
 
-  res.cookie('userId', user.id, { maxAge: 60 * 60 * 1000, httpOnly: true });
-  res.cookie('username', user.name, {
-    maxAge: 60 * 60 * 1000,
-    httpOnly: true,
-  });
-
-  res.status(201).json({ id: user.id, name: user.name, email: user.email });
+const logout = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const logoutUser = await userModel.fetchOne(Number(id));
+    if (!logoutUser) {
+      res.status(400).json({ message: "Login user is not found" });
+      return;
+    }
+    res.clearCookie("userEmail");
+    res
+      .status(200)
+      .json({ message: `${logoutUser.name} is successfully logged out` });
+  } catch (error) {}
 };
 
 const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await userModel.fetchAll();
     res.status(200).json(users);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error." });
   }
 };
 
@@ -77,33 +105,20 @@ const getUserById = async (req: Request, res: Response) => {
   try {
     const user = await userModel.fetchOne(Number(id));
     if (!user) {
-      res.status(404).json({ message: 'Cannot find user' });
+      res.status(404).json({ message: "Cannot find user" });
       return;
     }
     res.status(200).json(user);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-const addUser = async (req: Request, res: Response) => {
-  const { name, email } = req.body;
-
-  try {
-    const newUser = await userModel.add({
-      name,
-      email,
-    });
-    res.status(201).json(newUser);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 export default {
+  register,
+  login,
   getAllUsers,
   getUserById,
-  addUser,
+  logout,
 };
