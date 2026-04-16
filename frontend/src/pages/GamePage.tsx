@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Header } from "../components/Layout/Header";
 import { QuestionCard } from "../components/Quiz/QuestionCard";
 import { Timer } from "../components/Quiz/Timer";
 import { TeamChat } from "../components/Chat/TeamChat";
@@ -25,26 +26,32 @@ export function GamePage() {
   };
 
   return (
-    <div className="game-page">
-      <div className="game-page__quiz">
-        <Timer timeLeft={20} />
-        <QuestionCard
-          quiz={mockQuiz}
-          questionIndex={0}
-          totalQuestions={5}
-          selectedOption={selectedOption}
-          onSelect={setSelectedOption}
-        />
-        <button
-          className="game-page__next"
-          onClick={() => navigate("/result")}
-        >
-          Go to Result (dev)
-        </button>
+    <>
+      <Header />
+      <div className="game-page">
+        <div className="game-page__quiz">
+          <Timer timeLeft={20} />
+
+          <QuestionCard
+            quiz={mockQuiz}
+            questionIndex={0}
+            totalQuestions={5}
+            selectedOption={selectedOption}
+            onSelect={setSelectedOption}
+          />
+
+          <button
+            className="game-page__next"
+            onClick={() => navigate("/result")}
+          >
+            Go to Result
+          </button>
+        </div>
+
+        <div className="game-page__chat">
+          <TeamChat messages={messages} onSend={handleSend} />
+        </div>
       </div>
-      <div className="game-page__chat">
-        <TeamChat messages={messages} onSend={handleSend} />
-      </div>
-    </div>
+    </>
   );
 }

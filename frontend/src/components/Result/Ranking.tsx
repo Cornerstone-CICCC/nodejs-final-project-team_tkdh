@@ -9,7 +9,8 @@ export function Ranking({ teams }: RankingProps) {
 
   return (
     <div className="ranking">
-      <h2 className="ranking__title">Ranking</h2>
+      <h2 className="ranking__title">Final Ranking</h2>
+
       <ol className="ranking__list">
         {sorted.map((team, i) => (
           <li key={team.id} className="ranking__item">

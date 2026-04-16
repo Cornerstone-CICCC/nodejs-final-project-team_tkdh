@@ -8,7 +8,7 @@ export function Timer({ timeLeft }: TimerProps) {
   return (
     <div className={`timer ${isUrgent ? "timer--urgent" : ""}`}>
       <span className="timer__value">{timeLeft}</span>
-      <span className="timer__label">seconds</span>
+      <span className="timer__label">seconds left</span>
     </div>
   );
 }
