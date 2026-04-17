@@ -4,26 +4,13 @@ import { Header } from "../components/Layout/Header";
 import { QuestionCard } from "../components/Quiz/QuestionCard";
 import { Timer } from "../components/Quiz/Timer";
 import { TeamChat } from "../components/Chat/TeamChat";
-import { mockQuiz, mockMessages } from "../mock";
-import type { Message } from "../types";
+import { mockQuiz } from "../mock";
+import { useSocket } from "../hooks/useSocket";
 
 export function GamePage() {
   const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
-
-  const handleSend = (text: string) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: `m-${Date.now()}`,
-        userId: "u1",
-        userName: "You",
-        text,
-        timestamp: Date.now(),
-      },
-    ]);
-  };
+  const { messages, sendMessage } = useSocket();
 
   return (
     <>
@@ -49,7 +36,7 @@ export function GamePage() {
         </div>
 
         <div className="game-page__chat">
-          <TeamChat messages={messages} onSend={handleSend} />
+          <TeamChat messages={messages} onSend={sendMessage} />
         </div>
       </div>
     </>

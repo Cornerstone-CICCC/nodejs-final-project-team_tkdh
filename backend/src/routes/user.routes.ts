@@ -5,6 +5,7 @@ import { checkIsLoggedIn, logoutCheck } from "../middleware/auth.middleware";
 const userRouter = Router();
 
 userRouter.get("/", userController.getAllUsers);
+userRouter.get("/me", checkIsLoggedIn, userController.getMe);
 userRouter.get("/:id", checkIsLoggedIn, userController.getUserById);
 userRouter.post("/login", userController.login);
 userRouter.post("/register", userController.register);
