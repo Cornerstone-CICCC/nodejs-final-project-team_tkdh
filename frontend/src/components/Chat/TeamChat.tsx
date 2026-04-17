@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Message } from "../../types";
 
+
 type TeamChatProps = {
   messages: Message[];
   onSend: (text: string) => void;

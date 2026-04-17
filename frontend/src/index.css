@@ -38,12 +38,12 @@ body {
 
 /* Login Page */
 .login-page {
+  min-height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
+  padding: 24px;
 }
 
 .login-page__title {
@@ -63,7 +63,7 @@ body {
 .login-page__form input {
   padding: 12px 16px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 1rem;
   outline: none;
   background: var(--card-bg);
@@ -79,7 +79,7 @@ body {
   background: var(--primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 1rem;
   cursor: pointer;
   transition: 0.2s ease;
@@ -103,7 +103,7 @@ body {
 
 /* Lobby Page */
 .lobby-page {
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -226,6 +226,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 24px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .game-page__next {
@@ -244,28 +245,6 @@ body {
 .game-page__next:hover {
   background: var(--primary-hover);
   transform: translateY(-1px);
-}
-
-@media (max-width: 768px) {
-  .game-page {
-    flex-direction: column;
-  }
-
- .team-chat {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.team-chat__messages {
-  flex: 1;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
-  min-height: 0;
-}
-
 }
 
 /* Timer */
@@ -336,21 +315,6 @@ body {
   flex-direction: column;
   gap: 14px;
 }
-.question-card__option:nth-child(1) {
-  border-left: 4px solid #ef4444;
-}
-
-.question-card__option:nth-child(2) {
-  border-left: 4px solid #3b82f6;
-}
-
-.question-card__option:nth-child(3) {
-  border-left: 4px solid #eab308;
-}
-
-.question-card__option:nth-child(4) {
-  border-left: 4px solid #22c55e;
-}
 
 .question-card__option {
   width: 100%;
@@ -368,22 +332,38 @@ body {
   transition: all 0.2s ease;
 }
 
-.question-card__option:active {
-  transform: scale(0.98);
+.question-card__option:nth-child(1) {
+  border-left: 4px solid #ef4444;
 }
-.question-card__option--selected {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
+
+.question-card__option:nth-child(2) {
+  border-left: 4px solid #3b82f6;
 }
+
+.question-card__option:nth-child(3) {
+  border-left: 4px solid #eab308;
+}
+
+.question-card__option:nth-child(4) {
+  border-left: 4px solid #22c55e;
+}
+
 .question-card__option:hover {
   border-color: var(--primary);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(139, 92, 246, 0.18);
 }
 
+.question-card__option:active {
+  transform: scale(0.98);
+}
+
 .question-card__option--selected {
   border-color: var(--primary);
   background: rgba(139, 92, 246, 0.18);
-  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.24);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.24),
+    0 0 20px rgba(139, 92, 246, 0.35);
 }
 
 .question-card__option-index {
@@ -428,6 +408,7 @@ body {
 
 .team-chat__messages {
   flex: 1;
+  min-height: 0;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -449,6 +430,7 @@ body {
   border-radius: 50%;
   border: 2px solid #222;
   transition: 0.2s ease;
+  flex-shrink: 0;
 }
 
 .team-chat__avatar:hover {
@@ -463,13 +445,14 @@ body {
 
 .team-chat__author {
   font-size: 0.8rem;
-  font-weight: bold;
+  font-weight: 700;
   color: var(--primary);
 }
 
 .team-chat__text {
   font-size: 0.9rem;
   color: var(--text);
+  line-height: 1.35;
 }
 
 .team-chat__form {
@@ -558,7 +541,7 @@ body {
 
 /* Result Page */
 .result-page {
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -596,8 +579,7 @@ body {
   transform: translateY(-1px);
 }
 
-
-/* HEADER */
+/* Header */
 .app-header {
   width: 100%;
   height: 64px;
@@ -626,7 +608,6 @@ body {
   font-size: 0.65rem;
   letter-spacing: 5px;
   font-weight: 700;
-  color: var(--primary);
 }
 
 .app-header__logo span:first-child {
@@ -636,10 +617,12 @@ body {
 .app-header__logo span:last-child {
   color: var(--primary);
 }
+
 .app-header__nav {
   display: flex;
   gap: 24px;
 }
+
 .app-header__link {
   font-size: 0.85rem;
   color: var(--text-muted);
@@ -696,24 +679,118 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 10px;
   background: transparent;
   border: 1px solid transparent;
-
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-/* hover elegante */
 .icon-button:hover {
   color: var(--primary);
   background: rgba(139, 92, 246, 0.12);
   border-color: rgba(139, 92, 246, 0.25);
 }
 
-/* click feedback */
 .icon-button:active {
   transform: scale(0.95);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .app-header {
+    height: auto;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .app-header__left {
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .app-header__logo span {
+    font-size: 0.58rem;
+    letter-spacing: 3px;
+  }
+
+  .app-header__nav {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .app-header__link {
+    font-size: 0.8rem;
+  }
+
+  .app-header__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .app-header__cta {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+
+  .game-page {
+    flex-direction: column;
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .game-page__quiz {
+    width: 100%;
+    padding: 20px 16px;
+  }
+
+  .game-page__chat {
+    width: 100%;
+    height: 360px;
+  }
+
+  .question-card {
+    padding: 20px 16px;
+  }
+
+  .question-card__question {
+    font-size: 1.45rem;
+  }
+
+  .question-card__option {
+    padding: 16px;
+    font-size: 0.95rem;
+  }
+
+  .timer__value {
+    font-size: 3rem;
+  }
+
+  .lobby-page,
+  .result-page,
+  .login-page {
+    padding: 28px 16px;
+  }
+
+  .lobby-page__title,
+  .result-page__title {
+    font-size: 2.2rem;
+  }
+
+  .lobby-page__teams {
+    grid-template-columns: 1fr;
+  }
+
+  .ranking {
+    max-width: 100%;
+  }
+
+  .ranking__item {
+    padding: 16px;
+  }
 }
