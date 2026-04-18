@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { socket } from "../socket";
-import type { GameState, Message } from "../types";
+import type { GameState, Message, User } from "../types";
 
 const initialGameState: GameState = {
   currentQuestion: null,
@@ -11,22 +11,42 @@ const initialGameState: GameState = {
   phase: "waiting",
 };
 
+const subscribeConnection = (onStoreChange: () => void) => {
+  socket.on("connect", onStoreChange);
+  socket.on("disconnect", onStoreChange);
+  return () => {
+    socket.off("connect", onStoreChange);
+    socket.off("disconnect", onStoreChange);
+  };
+};
+
+const getConnectionSnapshot = () => socket.connected;
+
 export function useSocket() {
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const isConnected = useSyncExternalStore(
+    subscribeConnection,
+    getConnectionSnapshot,
+  );
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [teamId, setTeamId] = useState<string | null>(null);
 
   useEffect(() => {
-    socket.on("connect", () => setIsConnected(true));
-    socket.on("disconnect", () => setIsConnected(false));
-
-    socket.on("game:start", (data: { teamId: string; teams: GameState["teams"] }) => {
+    const onRoomUsers = (data: { users: User[] }) => setUsers(data.users);
+    const onChatMessage = (message: Message) =>
+      setMessages((prev) => [...prev, message]);
+    const onGameStart = (data: {
+      teamId: string;
+      teams: GameState["teams"];
+    }) => {
       setTeamId(data.teamId);
       setGameState((prev) => ({ ...prev, teams: data.teams, phase: "waiting" }));
-    });
-
-    socket.on("game:question", (data: { question: GameState["currentQuestion"]; index: number }) => {
+    };
+    const onGameQuestion = (data: {
+      question: GameState["currentQuestion"];
+      index: number;
+    }) => {
       setGameState((prev) => ({
         ...prev,
         currentQuestion: data.question,
@@ -34,38 +54,45 @@ export function useSocket() {
         phase: "question",
         timeLeft: 30,
       }));
-    });
-
-    socket.on("game:timer", (timeLeft: number) => {
+    };
+    const onGameTimer = (timeLeft: number) =>
       setGameState((prev) => ({ ...prev, timeLeft }));
-    });
-
-    socket.on("game:result", (teams: GameState["teams"]) => {
+    const onGameResult = (teams: GameState["teams"]) =>
       setGameState((prev) => ({ ...prev, teams, phase: "result" }));
-    });
-
-    socket.on("game:end", (teams: GameState["teams"]) => {
+    const onGameEnd = (teams: GameState["teams"]) =>
       setGameState((prev) => ({ ...prev, teams, phase: "finished" }));
-    });
 
-    socket.on("chat:message", (message: Message) => {
-      setMessages((prev) => [...prev, message]);
-    });
+    socket.on("room:users", onRoomUsers);
+    socket.on("chat:message", onChatMessage);
+    socket.on("game:start", onGameStart);
+    socket.on("game:question", onGameQuestion);
+    socket.on("game:timer", onGameTimer);
+    socket.on("game:result", onGameResult);
+    socket.on("game:end", onGameEnd);
 
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("game:start");
-      socket.off("game:question");
-      socket.off("game:timer");
-      socket.off("game:result");
-      socket.off("game:end");
-      socket.off("chat:message");
+      socket.off("room:users", onRoomUsers);
+      socket.off("chat:message", onChatMessage);
+      socket.off("game:start", onGameStart);
+      socket.off("game:question", onGameQuestion);
+      socket.off("game:timer", onGameTimer);
+      socket.off("game:result", onGameResult);
+      socket.off("game:end", onGameEnd);
     };
   }, []);
 
-  const connect = () => socket.connect();
+  const connect = () => {
+    if (!socket.connected) socket.connect();
+  };
   const disconnect = () => socket.disconnect();
+
+  const joinRoom = (room: string) => {
+    socket.emit("room:join", { room });
+  };
+
+  const leaveRoom = (room: string) => {
+    socket.emit("room:leave", { room });
+  };
 
   const sendMessage = (text: string) => {
     socket.emit("chat:send", { text });
@@ -79,9 +106,12 @@ export function useSocket() {
     isConnected,
     gameState,
     messages,
+    users,
     teamId,
     connect,
     disconnect,
+    joinRoom,
+    leaveRoom,
     sendMessage,
     submitAnswer,
   };

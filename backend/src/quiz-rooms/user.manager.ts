@@ -1,11 +1,21 @@
-const usersInRoom: Record<string, Record<string, string>> = {};
+export type RoomUser = {
+  id: string;
+  name: string;
+  teamId: string | null;
+};
+
+const usersInRoom: Record<string, Record<string, RoomUser>> = {};
 
 export const addUser = (room: string, socketId: string, username: string) => {
   if (!usersInRoom[room]) {
     usersInRoom[room] = {};
   }
 
-  usersInRoom[room][socketId] = username;
+  usersInRoom[room][socketId] = {
+    id: socketId,
+    name: username,
+    teamId: null,
+  };
 };
 
 export const removeUser = (room: string, socketId: string) => {
@@ -19,11 +29,11 @@ export const removeUser = (room: string, socketId: string) => {
   }
 };
 
-export const getUsersInRoom = (room: string) => {
+export const getUsersInRoom = (room: string): RoomUser[] => {
   const roomUsers = usersInRoom[room];
   return roomUsers ? Object.values(roomUsers) : [];
 };
 
-export const getUsername = (room: string, socketId: string) => {
-  return usersInRoom[room]?.[socketId];
+export const getUsername = (room: string, socketId: string): string | undefined => {
+  return usersInRoom[room]?.[socketId]?.name;
 };

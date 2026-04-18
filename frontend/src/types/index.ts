@@ -36,3 +36,9 @@ export type GameState = {
   teams: Team[];
   phase: GamePhase;
 };
+
+export type AuthUser = {
+  id: number;
+  name: string;
+  email: string;
+};

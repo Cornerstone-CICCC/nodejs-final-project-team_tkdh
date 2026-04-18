@@ -73,9 +73,11 @@ const login = async (
       maxAge: 60 * 60 * 1000,
       httpOnly: true,
     });
-    res
-      .status(200)
-      .json({ message: `${loginUser.name} is successfully logged in` });
+    res.status(200).json({
+      id: loginUser.id,
+      name: loginUser.name,
+      email: loginUser.email,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -96,6 +98,25 @@ const logout = async (req: Request, res: Response) => {
       .status(200)
       .json({ message: `${logoutUser.name} is successfully logged out` });
   } catch (error) {}
+};
+
+const getMe = async (req: Request, res: Response) => {
+  const { userId } = req.cookies;
+  try {
+    const user = await userModel.fetchOne(Number(userId));
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res.status(200).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 const getAllUsers = async (req: Request, res: Response) => {
@@ -134,5 +155,6 @@ export default {
   login,
   getAllUsers,
   getUserById,
+  getMe,
   logout,
 };
