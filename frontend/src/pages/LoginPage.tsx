@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE } from "../constants";
+import { useAuth } from "../contexts/auth-context";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { refetch } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -13,24 +16,26 @@ export function LoginPage() {
     e.preventDefault();
     setError("");
 
-    const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
+    const endpoint = isRegister ? "/users/register" : "/users/login";
     const body = isRegister
       ? { name, email, password }
       : { email, password };
 
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.message || "Something went wrong");
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || data.message || "Something went wrong");
         return;
       }
 
+      await refetch();
       navigate("/lobby");
     } catch {
       setError("Failed to connect to server");

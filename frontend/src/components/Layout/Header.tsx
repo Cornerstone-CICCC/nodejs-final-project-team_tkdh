@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/auth-context";
 
 /* 🔔 Bell Icon */
 function BellIcon() {
@@ -38,6 +39,13 @@ function SettingsIcon() {
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="app-header">
@@ -92,7 +100,18 @@ export function Header() {
           </button>
         </div>
 
-        <button className="app-header__cta">Sign In</button>
+        {user ? (
+          <>
+            <span className="app-header__user">{user.name}</span>
+            <button className="app-header__cta" onClick={handleLogout}>
+              Logout
+            </button>
+          </>
+        ) : (
+          <Link to="/login" className="app-header__cta">
+            Sign In
+          </Link>
+        )}
       </div>
     </header>
   );

@@ -1,20 +1,45 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-// import { LoginPage } from "./pages/LoginPage";
+import { LoginPage } from "./pages/LoginPage";
 import { LobbyPage } from "./pages/LobbyPage";
 import { GamePage } from "./pages/GamePage";
 import { ResultPage } from "./pages/ResultPage";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* TODO: should set login page if we complete auth features */}
-        <Route path="/" element={<Navigate to="/lobby" replace />} />
-        <Route path="/lobby" element={<LobbyPage />} />
-        <Route path="/game" element={<GamePage />} />
-        <Route path="/result" element={<ResultPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/lobby" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/lobby"
+            element={
+              <ProtectedRoute>
+                <LobbyPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/game"
+            element={
+              <ProtectedRoute>
+                <GamePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/result"
+            element={
+              <ProtectedRoute>
+                <ResultPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
