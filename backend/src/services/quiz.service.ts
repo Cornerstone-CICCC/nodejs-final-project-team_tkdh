@@ -1,4 +1,4 @@
-import quizModel from "../models/quiz.model";
+import quizModel from '../models/quiz.model';
 
 // return <random five questions> and <the five answers>
 export const fetchRandomQuizzes = async () => {
@@ -22,5 +22,13 @@ export const fetchRandomQuizzes = async () => {
   return {
     fiveQuizzesWithoutAnswer,
     fiveAnswers,
+  };
+};
+
+export const assingTeams = (players: string[]) => {
+  const suffled = [...players].sort(() => Math.random() - 0.5);
+  return {
+    team1: suffled.slice(0, 2),
+    team2: suffled.slice(2, 4),
   };
 };

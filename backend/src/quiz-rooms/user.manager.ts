@@ -34,6 +34,19 @@ export const getUsersInRoom = (room: string): RoomUser[] => {
   return roomUsers ? Object.values(roomUsers) : [];
 };
 
-export const getUsername = (room: string, socketId: string): string | undefined => {
+export const getUsername = (
+  room: string,
+  socketId: string,
+): string | undefined => {
   return usersInRoom[room]?.[socketId]?.name;
+};
+
+export const assingTeamToUser = (
+  room: string,
+  socketId: string,
+  teamId: string,
+) => {
+  if (usersInRoom[room]?.[socketId]) {
+    usersInRoom[room][socketId].teamId = teamId;
+  }
 };
