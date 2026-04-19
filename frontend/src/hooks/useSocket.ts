@@ -102,6 +102,10 @@ export function useSocket() {
     socket.emit("team:answer", { optionIndex });
   };
 
+  const startGame = () => {
+    socket.emit("game:start");
+  };
+
   return {
     isConnected,
     gameState,
@@ -114,5 +118,6 @@ export function useSocket() {
     leaveRoom,
     sendMessage,
     submitAnswer,
+    startGame,
   };
 }

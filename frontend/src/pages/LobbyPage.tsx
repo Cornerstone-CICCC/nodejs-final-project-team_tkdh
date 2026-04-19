@@ -8,8 +8,13 @@ import { DEFAULT_ROOM } from "../constants";
 export function LobbyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isConnected, users, connect, joinRoom } = useSocket();
+  const { isConnected, users, connect, joinRoom, startGame } = useSocket();
   const hasJoinedRef = useRef(false);
+
+  const handleStartGame = () => {
+    startGame();
+    navigate("/game");
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -57,7 +62,7 @@ export function LobbyPage() {
 
         <button
           className="lobby-page__start"
-          onClick={() => navigate("/game")}
+          onClick={handleStartGame}
         >
           Start Game
         </button>
