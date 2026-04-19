@@ -4,6 +4,7 @@ import {
   getUsersInRoom,
   removeUser,
   assingTeamToUser,
+  getUserTeam,
 } from './user.manager';
 import { assingTeams, fetchRandomQuizzes } from '../services/quiz.service';
 
@@ -58,7 +59,7 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
 
     currentRoom = data.room;
     socket.join(data.room);
-    addUser(data.room, authUserId, userName);
+    addUser(data.room, socket.id, userName);
 
     io.to(data.room).emit(
       'chat:message',
@@ -70,7 +71,7 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
   socket.on('room:leave', (data: { room: string }) => {
     if (!data?.room) return;
     socket.leave(data.room);
-    removeUser(data.room, authUserId);
+    removeUser(data.room, socket.id);
     if (currentRoom === data.room) currentRoom = null;
 
     io.to(data.room).emit(
@@ -82,7 +83,9 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
 
   socket.on('chat:send', (data: { text: string }) => {
     if (!currentRoom || !data?.text) return;
-    io.to(currentRoom).emit(
+    const teamId = getUserTeam(currentRoom, socket.id);
+    const target = teamId ?? currentRoom;
+    io.to(target).emit(
       'chat:message',
       buildUserMessage(authUserId, userName, data.text),
     );
@@ -92,6 +95,13 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
     if (!currentRoom) return;
 
     const users = getUsersInRoom(currentRoom);
+    if (users.length < 2) {
+      socket.emit('game:error', {
+        message: 'Need at least 2 players to start the game.',
+      });
+      return;
+    }
+
     const socketIds = users.map((u) => u.id);
     const teams = assingTeams(socketIds);
 
@@ -141,10 +151,10 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
           currentQuestionIndex++;
           emitQuestion(currentQuestionIndex);
         }
-      }, 3000);
+      }, 30000);
     };
 
-    emitQuestion(0);
+    setTimeout(() => emitQuestion(0), 10000);
   });
 
   socket.on('game:answer', (data: { team: string; answer: string }) => {
@@ -152,6 +162,8 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
 
     if (answers[data.team]) return;
     answers[data.team] = data.answer;
+
+    io.to(data.team).emit('team:answer-selected', { answer: data.answer });
 
     if (Object.keys(answers).length === 2) {
       const correct = correctAnswer[currentQuestionIndex];
@@ -170,7 +182,7 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
 
   socket.on('disconnect', () => {
     if (!currentRoom) return;
-    removeUser(currentRoom, authUserId);
+    removeUser(currentRoom, socket.id);
     io.to(currentRoom).emit(
       'chat:message',
       buildSystemMessage(`${userName} has left ${currentRoom}.`),

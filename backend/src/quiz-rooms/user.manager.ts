@@ -50,3 +50,10 @@ export const assingTeamToUser = (
     usersInRoom[room][socketId].teamId = teamId;
   }
 };
+
+export const getUserTeam = (
+  room: string,
+  socketId: string,
+): string | null => {
+  return usersInRoom[room]?.[socketId]?.teamId ?? null;
+};

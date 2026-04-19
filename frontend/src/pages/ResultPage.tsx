@@ -1,10 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { Header } from "../components/Layout/Header";
 import { Ranking } from "../components/Result/Ranking";
-import { mockTeams } from "../mock";
+import { useSocket } from "../contexts/socket-context";
 
 export function ResultPage() {
   const navigate = useNavigate();
+  const { gameState, resetGame } = useSocket();
+
+  const handleBack = () => {
+    resetGame();
+    navigate("/lobby");
+  };
 
   return (
     <>
@@ -13,12 +19,9 @@ export function ResultPage() {
         <h1 className="result-page__title">Game Over</h1>
         <p className="result-page__subtitle">Here are the final team scores</p>
 
-        <Ranking teams={mockTeams} />
+        <Ranking scores={gameState.scores} myTeam={gameState.myTeam} />
 
-        <button
-          className="result-page__back"
-          onClick={() => navigate("/lobby")}
-        >
+        <button className="result-page__back" onClick={handleBack}>
           Back to Lobby
         </button>
       </div>

@@ -26,9 +26,10 @@ export const fetchRandomQuizzes = async () => {
 };
 
 export const assingTeams = (players: string[]) => {
-  const suffled = [...players].sort(() => Math.random() - 0.5);
+  const shuffled = [...players].sort(() => Math.random() - 0.5);
+  const half = Math.ceil(shuffled.length / 2);
   return {
-    team1: suffled.slice(0, 2),
-    team2: suffled.slice(2, 4),
+    team1: shuffled.slice(0, half),
+    team2: shuffled.slice(half),
   };
 };

@@ -4,18 +4,10 @@ export type User = {
   teamId: string | null;
 };
 
-export type Team = {
-  id: string;
-  name: string;
-  members: User[];
-  score: number;
-};
-
 export type Quiz = {
-  id: string;
+  id: number;
   question: string;
-  options: [string, string, string, string];
-  correctIndex: number;
+  options: string[];
 };
 
 export type Message = {
@@ -26,14 +18,23 @@ export type Message = {
   timestamp: number;
 };
 
-export type GamePhase = "waiting" | "question" | "result" | "finished";
+export type TeamId = "team1" | "team2";
+
+export type Scores = Record<TeamId, number>;
+
+export type TeamMembers = Record<TeamId, string[]>;
+
+export type GamePhase = "waiting" | "starting" | "question" | "result" | "finished";
 
 export type GameState = {
   currentQuestion: Quiz | null;
   questionIndex: number;
   totalQuestions: number;
-  timeLeft: number;
-  teams: Team[];
+  teams: TeamMembers;
+  myTeam: TeamId | null;
+  scores: Scores;
+  correctAnswer: string | null;
+  teamAnswer: string | null;
   phase: GamePhase;
 };
 
