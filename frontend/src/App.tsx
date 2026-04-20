@@ -4,12 +4,14 @@ import { LobbyPage } from "./pages/LobbyPage";
 import { GamePage } from "./pages/GamePage";
 import { ResultPage } from "./pages/ResultPage";
 import { AuthProvider } from "./contexts/AuthContext";
+import { SocketProvider } from "./contexts/SocketContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <SocketProvider>
         <Routes>
           <Route path="/" element={<Navigate to="/lobby" replace />} />
           <Route path="/login" element={<LoginPage />} />
@@ -39,6 +41,7 @@ function App() {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </SocketProvider>
       </AuthProvider>
     </BrowserRouter>
   );

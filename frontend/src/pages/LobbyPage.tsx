@@ -1,15 +1,31 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "../components/Layout/Header";
-import { useSocket } from "../hooks/useSocket";
+import { useSocket } from "../contexts/socket-context";
 import { useAuth } from "../contexts/auth-context";
 import { DEFAULT_ROOM } from "../constants";
 
 export function LobbyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isConnected, users, connect, joinRoom } = useSocket();
+  const {
+    isConnected,
+    users,
+    gameState,
+    errorMessage,
+    connect,
+    joinRoom,
+    startGame,
+    clearError,
+  } = useSocket();
   const hasJoinedRef = useRef(false);
+  const [isStarting, setIsStarting] = useState(false);
+
+  const handleStartGame = () => {
+    clearError();
+    setIsStarting(true);
+    startGame();
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -21,6 +37,16 @@ export function LobbyPage() {
     joinRoom(DEFAULT_ROOM);
     hasJoinedRef.current = true;
   }, [user, isConnected, joinRoom]);
+
+  useEffect(() => {
+    if (gameState.phase === "starting" || gameState.phase === "question") {
+      navigate("/game");
+    }
+  }, [gameState.phase, navigate]);
+
+  useEffect(() => {
+    if (errorMessage) setIsStarting(false);
+  }, [errorMessage]);
 
   if (!user) return null;
 
@@ -55,11 +81,18 @@ export function LobbyPage() {
           </div>
         </div>
 
+        {errorMessage && (
+          <p className="lobby-page__error" role="alert">
+            {errorMessage}
+          </p>
+        )}
+
         <button
           className="lobby-page__start"
-          onClick={() => navigate("/game")}
+          onClick={handleStartGame}
+          disabled={isStarting}
         >
-          Start Game
+          {isStarting ? "Starting..." : "Start Game"}
         </button>
       </div>
     </>
